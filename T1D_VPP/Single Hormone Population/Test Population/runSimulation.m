@@ -122,17 +122,26 @@ for kk = 0:Sim_time
     [Ur_Plnt, Ur_Mdl, Dr_Plnt, Dr_Mdl, Cntr_Resc,time_resc,resc_trig_Cntr] = GetRescueCarb(Y_Plant,Ur_Plnt,Ur_Mdl,Dr_Plnt,Dr_Mdl, kk,Ts,ModPar,Cntr_Resc,time_resc,resc_trig_Cntr,Thr_Resc,Carbs_resc,Win_Resc,IIR_Red_Resc,Timer_Resc,Weight,tmax_resc,delay_rescue_val);
     %Rescue_Carb_Alg;
 end
-Font_size = 14;
-Xaxis_time = 0:(length(BG_Output)-1); Xaxis_time = Xaxis_time * Ts / 60 /24;
-figure; 
-subplot(211); plot(Xaxis_time, BG_Output); 
-xhandle = xlabel('time [Day]'); yhandle = ylabel('Glucose [mg/dl]');
-set(xhandle,'Fontsize',Font_size) ; set(xhandle,'Fontname','Timesnewroman');
-set(yhandle,'Fontsize',Font_size) ; set(yhandle,'Fontname','Timesnewroman');
-axis([0 Xaxis_time(1,end) 50 max(BG_Output)+50])
-box('off')
-subplot(212); plot(Xaxis_time, Ins_input);
-xhandle = xlabel('time [Day]'); yhandle = ylabel('Insulin [u/hr]');
-set(xhandle,'Fontsize',Font_size) ; set(xhandle,'Fontname','Timesnewroman');
-set(yhandle,'Fontsize',Font_size) ; set(yhandle,'Fontname','Timesnewroman');
+
+%% Plot
+% Font_size = 14;
+% Xaxis_time = 0:(length(BG_Output)-1); Xaxis_time = Xaxis_time * Ts / 60 /24;
+% figure; 
+% subplot(211); plot(Xaxis_time, BG_Output); 
+% xhandle = xlabel('time [Day]'); yhandle = ylabel('Glucose [mg/dl]');
+% set(xhandle,'Fontsize',Font_size) ; set(xhandle,'Fontname','Timesnewroman');
+% set(yhandle,'Fontsize',Font_size) ; set(yhandle,'Fontname','Timesnewroman');
+% axis([0 Xaxis_time(1,end) 50 max(BG_Output)+50])
+% box('off')
+% subplot(212); plot(Xaxis_time, Ins_input);
+% xhandle = xlabel('time [Day]'); yhandle = ylabel('Insulin [u/hr]');
+% set(xhandle,'Fontsize',Font_size) ; set(xhandle,'Fontname','Timesnewroman');
+% set(yhandle,'Fontsize',Font_size) ; set(yhandle,'Fontname','Timesnewroman');
+
+%% Outputs
+G = BG_Output(2:end)'; % mg/dl
+IB = Bolus * Weight / 1000; %u/min
+Ib = ones(size(G)) * u_Basal * Weight / 1000; %u/min
+CHO = Meal_Vector'/Ts; %g/min
+BW = Weight;
 end
