@@ -83,7 +83,7 @@ tmax_resc = 20;
 % another Carbs_resc will be given and glucose is remeasured after Win_Resc until Glucose > Thr_Resc;
 % meanwhile Insulin insulin rates are turned down to IIR_Red_Resc percent for Timer_Resc minutes 
 % Note: time-to-maximum rescure carb absorption is tmax_resc [min] 
-Thr_Resc = 70;  % Rescue carbs given for glucose < 70 mg/dL
+Thr_Resc = -inf;  % Rescue carbs given for glucose < 70 mg/dL
 Carbs_resc = 20; % 20 g of carbs given when glucose <  70 mg/dL
 Win_Resc = 40/Ts;  % Window for lower insulin dosed is 40 minutes after hypo
 IIR_Red_Resc = 0.25; Timer_Resc = 40/Ts;  % Insulin is reduced to 25% for 40 minutes after a hypo
@@ -93,6 +93,7 @@ Cntr_Resc = Win_Resc;
 % measurement after a rescue carb is given; should be set to Win_Resc  
 resc_trig_Cntr = 0; time_resc = []; Ur_Plnt = 0; Ur_Mdl = 0;Dr_Plnt = 0; Dr_Mdl=0;
 Ins_Adj_Resc = ones(1,Sim_time+1); 
+
 %% 
 
 % Provide patient with constant basal insulin
