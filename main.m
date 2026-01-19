@@ -2,7 +2,7 @@ close all
 clear all
 clc
 
-addpath(genpath('T1D_VPP'));
+addpath(genpath(fullfile('T1D_VPP', 'Single Hormone Population')));
 
 nPats = 99;
 rng(42)
