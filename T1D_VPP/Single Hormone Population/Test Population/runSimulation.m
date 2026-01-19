@@ -36,11 +36,49 @@ ModPar(16) = Weights(1,nn);      % Weight of the virtual subject (kg);
 Weight = ModPar(16);
 
 %% Select a sample meal scenario
+time_B  = 0.5*12  : 2.5*12;      % 6:30–8:30
+time_S1 = 3.5*12  : 5.5*12;      % 9:30–11:30
+time_L  = 6.5*12  : 8.5*12;      % 12:30–14:30
+time_S2 = 10.5*12 : 11.5*12;     % 16:30–17:30
+time_D  = 13.5*12 : 15.5*12;     % 19:30–21:30
 
-Scenario(:,1) = [ 8; 50; 121; 303; 397; 404; 433; 566; 645; 703; 871; 914; 985];     % Time of meal event (sample)
-Scenario(:,2) = [35; 79; 117; 40;  15;  100; 30;  100; 100; 100; 35;  79;  117];     % Amount carbs in meal event (gram)
-Time_Meal = round(Scenario(:,1)); Amt_Meal = Scenario(:,2);
-Meal_Vector = zeros(1,Sim_time); Meal_Vector(Time_Meal) = Amt_Meal;
+time_2B = 24*12 + (0.5*12  : 2.5*12);     % next day
+time_2S = 24*12 + (3.5*12  : 5*12);       % next day
+
+rng(pat_seed);
+Scenario(:,1) = [
+    datasample(time_B,1)
+    datasample(time_S1,1)
+    datasample(time_L,1)
+    datasample(time_S2,1)
+    datasample(time_D,1)
+    datasample(time_2B,1)
+    datasample(time_2S,1)
+];
+
+amount_B  = 40:5:90;      % g
+amount_S1 = 30:5:40;      % g
+amount_L  = 40:5:100;     % g
+amount_S2 = 30:5:40;      % g
+amount_D  = 40:5:90;      % g
+
+amount_2B = 40:5:90;      % g
+amount_2S = 30:5:40;      % g
+
+Scenario(:,2) = [
+    datasample(amount_B,1)
+    datasample(amount_S1,1)
+    datasample(amount_L,1)
+    datasample(amount_S2,1)
+    datasample(amount_D,1)
+    datasample(amount_2B,1)
+    datasample(amount_2S,1)
+];
+
+Time_Meal = round(Scenario(:,1)); 
+Amt_Meal = Scenario(:,2);
+Meal_Vector = zeros(1,Sim_time); 
+Meal_Vector(Time_Meal) = Amt_Meal;
 meal_time= []; meal_Amount = [];
 
 %% Bolus calculations
