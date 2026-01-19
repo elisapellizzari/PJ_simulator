@@ -94,10 +94,14 @@ Cntr_Resc = Win_Resc;
 resc_trig_Cntr = 0; time_resc = []; Ur_Plnt = 0; Ur_Mdl = 0;Dr_Plnt = 0; Dr_Mdl=0;
 Ins_Adj_Resc = ones(1,Sim_time+1); 
 
-%% 
-
+%% Basal insulin
 % Provide patient with constant basal insulin
 u_Basal = (TDIRlist(1,nn)/TDIR_Basal_Rate/24)*1000/Weight/60; % basal insulin (mU/kg/min)
+
+%% Modulate inputs
+Meal_Vector = Meal_Vector*mealModulation;
+Bolus = Bolus*bolusModulation;
+u_Basal = u_Basal*basalModulation;
 
 for kk = 0:Sim_time
     if kk == 0
