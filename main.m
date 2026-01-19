@@ -181,7 +181,7 @@ end
 
 
 
-function saveResults(glucose, bolus, basal, meal, weights, label)
+function saveResults(glucose, bolus, basal, meal, iob, weights, crs, cfs, gts, label)
 
     saveFolderName = fullfile('results', label);
     if ~exist(saveFolderName, 'dir')
@@ -195,6 +195,7 @@ function saveResults(glucose, bolus, basal, meal, weights, label)
     basalAll = basal(startSample:endSample,:);
     bolusAll = bolus(startSample:endSample,:);
     mealAll = meal(startSample:endSample,:);
+    iobAll = iob(startSample:endSample,:);
     
     for p = 1:size(glucose,2)
 
@@ -205,18 +206,34 @@ function saveResults(glucose, bolus, basal, meal, weights, label)
         cho = mealAll(:,p);
         bolus = bolusAll(:,p);
         basal = basalAll(:,p);
+        iob = iobAll(:,p);
 
         cho_label = strings(length(cho),1);
         bolus_label = strings(length(cho),1);
-        idxs = [12, 72, 156, 300];
-        cho_label(idxs([1, 4])) = "B";
-        cho_label(idxs([2])) = "L";
-        cho_label(idxs([3])) = "D";
-        bolus_label(idxs([1, 4])) = "B";
-        bolus_label(idxs([2])) = "L";
-        bolus_label(idxs([3])) = "D";
+        idxs_cho = find(cho ~= 0);
+        idxs_bolus = find(bolus ~= 0);
+        if ~isempty(idxs_cho)
+            if length(idxs_cho)==7
+                cho_label(idxs_cho([1, 6])) = "B";
+                cho_label(idxs_cho([2, 4, 7])) = "S";
+                cho_label(idxs_cho([3])) = "L";
+                cho_label(idxs_cho([5])) = "D";
 
-        data = table(t,glucose,bolus,bolus_label,basal,cho,cho_label);
+            else
+                cho_label(idxs_cho([1, 7])) = "B";
+                cho_label(idxs_cho([2, 5, 8])) = "S";
+                cho_label(idxs_cho([3])) = "L";
+                cho_label(idxs_cho([6])) = "D";
+                cho_label(idxs_cho([4])) = "added S";
+            end
+
+            for k = 1:length(idxs_bolus)
+                [~, idx_min] = min(abs(idxs_cho - idxs_bolus(k)));  % closest CHO index
+                bolus_label(idxs_bolus(k)) = cho_label(idxs_cho(idx_min));
+            end
+        end
+
+        data = table(t,glucose,bolus,bolus_label,basal,cho,cho_label,iob);
 
         writetable(data, fullfile(saveFolderName,['patient_' num2str(p) '.csv']));
 
@@ -225,7 +242,7 @@ function saveResults(glucose, bolus, basal, meal, weights, label)
     patient = (1:99)';
     bw = weights;
     
-    data = table(patient,weights);
-    writetable(data, fullfile(saveFolderName,['bw.csv']));
+    data = table(patient, weights, crs, cfs, gts);
+    writetable(data, fullfile(saveFolderName,['patInfo.csv']));
     
 end
