@@ -1,4 +1,4 @@
-function [G, CHO, IB, Ib, BW, ICR, CF, GT] = runSimulation(nn,bolusInput_flag,bolusInput,bolusModulation,mealModulation,basalModulation)
+function [G, CHO, IB, Ib, BW, ICR, CF, GT] = runSimulation(nn,bolusInput_flag,bolusInput,mealModulation,basalModulation,pat_seed)
 % This is a test file showing the glucose data for a sample meal sceanrio and
 % a sample virtual patient using the equations reporterd in Resalat et al.
 % 2019, "A statistical virtual patient population for the glucoregulatory system 
@@ -141,11 +141,11 @@ Ins_Adj_Resc = ones(1,Sim_time+1);
 
 %% Basal insulin
 % Provide patient with constant basal insulin
-u_Basal = (TDIRlist(1,nn)/TDIR_Basal_Rate/24)*1000/Weight/60; % basal insulin (mU/kg/min)
+u_Basal = (TDIRlist(1,nn)/TDIR_Basal_Rate/24)*1000/Weight/60); % basal insulin (mU/kg/min)
 
 %% Modulate inputs
 Meal_Vector = Meal_Vector*mealModulation;
-Bolus = Bolus*bolusModulation;
+Bolus = Bolus;
 u_Basal = u_Basal*basalModulation;
 
 for kk = 0:Sim_time
@@ -206,7 +206,7 @@ end
 
 %% Outputs
 G = BG_Output(2:end)'; % mg/dl
-IB = Bolus * Weight / 1000; %u/min
+IB = bolus_vec * Weight / 1000; %u/min
 Ib = ones(size(G)) * u_Basal * Weight / 1000; %u/min
 CHO = Meal_Vector'/Ts; %g/min
 BW = Weight;
