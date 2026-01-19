@@ -82,7 +82,10 @@ Meal_Vector(Time_Meal) = Amt_Meal;
 meal_time= []; meal_Amount = [];
 
 %% Bolus calculations
-ICR = (1700/TDIRlist(1,nn)/3);                      % ICR: Insulin to Carb Ratio
+ICR = (500/TDIRlist(1,nn));                                                 % ICR: Insulin to Carb Ratio
+CF = (1700/TDIRlist(1,nn));
+GT = 120;
+
 Ip = 1;                                             % percentage of pre-meal bolus  [unitless: 0-1]
 Bolus = Ip*(Meal_Vector/ICR)*1000/(Weight*Ts);      % pre-meal bolus insulin with correct units for model        [mU/kg/min]
 
