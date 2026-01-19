@@ -1,4 +1,4 @@
-function [G, CHO, IB, Ib, BW] = runSimulation(nn,bolusModulation,mealModulation,basalModulation)
+function [G, CHO, IB, Ib, BW, ICR, CF, GT] = runSimulation(nn,bolusModulation,mealModulation,basalModulation)
 % This is a test file showing the glucose data for a sample meal sceanrio and
 % a sample virtual patient using the equations reporterd in Resalat et al.
 % 2019, "A statistical virtual patient population for the glucoregulatory system 
