@@ -174,8 +174,10 @@ for kk = 0:Sim_time
 
     %% Meal Response
     [Ug_Plnt,Ml_Vec_Plnt,meal_time,meal_Amount] = GetMealResponse(ModPar,Num_States_Plant,kk,Ts,meal_Amount,meal_time,Meal_Vector,Weight);
+
     %% Exercise Response
     [M_E_PIU, M_E_PGU, M_E_HGP, PGUA_1_Act] = GetExerciseResponse(kk, PVO2max, PAMM, Ex_Onset_time, Ex_duration, PGUA_1_Act);
+
     %%
     [Ap,Bp,Cp,Dp] = SH_Glucoregulatory(xm_Plnt, ModPar, Ts, M_E_PIU, M_E_PGU, M_E_HGP);
     xm_Plnt = Ap*xm_Plnt + Bp*u_Total + Dp + Ml_Vec_Plnt*(Ug_Plnt + Ur_Plnt)*Ts;    % y: mmol/kg
@@ -184,6 +186,7 @@ for kk = 0:Sim_time
     Ins_input(kk+1) = u_Total * Weight * 60 / 1000;  % convert from mu/kg/min to u/hr
     [Ur_Plnt, Ur_Mdl, Dr_Plnt, Dr_Mdl, Cntr_Resc,time_resc,resc_trig_Cntr] = GetRescueCarb(Y_Plant,Ur_Plnt,Ur_Mdl,Dr_Plnt,Dr_Mdl, kk,Ts,ModPar,Cntr_Resc,time_resc,resc_trig_Cntr,Thr_Resc,Carbs_resc,Win_Resc,IIR_Red_Resc,Timer_Resc,Weight,tmax_resc,delay_rescue_val);
     %Rescue_Carb_Alg;
+    
 end
 
 %% Plot
