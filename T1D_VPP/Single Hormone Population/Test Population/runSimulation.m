@@ -89,7 +89,7 @@ GT = 120;
 Ip = 1;                                             % percentage of pre-meal bolus  [unitless: 0-1]
 Bolus = Ip*(Meal_Vector/ICR)*1000/(Weight*Ts);      % pre-meal bolus insulin with correct units for model        [mU/kg/min]
 
-delayBolus = -30/Ts; 
+delayBolus = datasample([-30:5:30],1)/Ts;
 
 if(delayBolus < 0)
     Bolus = [Bolus((abs(delayBolus) + 1): end) zeros(1,abs(delayBolus))];
