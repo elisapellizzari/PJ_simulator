@@ -8,15 +8,13 @@ function [G, CHO, IB, Ib, BW] = runSimulation(nn,bolusModulation,mealModulation,
 % with any controllers' (MPC vs PID vs Fuzzy logic) output for AP in-silico analyses.
 % Note: the states of the single hormone system are  [Q1; Q2; S1; S2; I; x1; x2; x3]
 
-%clear, clc, %close all
 %% loading the VPP
 load('SingleHormone_VPP.mat'); 
-%addpath('../Create Population');
 
 Ts = 5;                          % Ts: sampling interval every 5 minutes (min);
 Days_Sim = 2;                    % Number of simulation Days
 Sim_time = Days_Sim*1440/Ts;     % simulation time (sample) 
-%nn = 2;                          % ID of the virtual subject
+% nn = 2;                          % ID of the virtual subject
 
 %% loading the model parameters of the selected virtual patient 
 
@@ -39,46 +37,27 @@ ModPar(16) = Weights(1,nn);      % Weight of the virtual subject (kg);
 Weight = ModPar(16);
 %% Select a sample meal scenario
 
-%Scenario(:,1) = [ 8; 50; 121; 303; 397; 404; 433; 566; 645; 703; 871; 914; 985];     % Time of meal event (sample)
-%Scenario(:,2) = [35; 79; 117; 40;  15;  100; 30;  100; 100; 100; 35;  79;  117];     % Amount carbs in meal event (gram)
-%Scenario(:,1) = [ 1];     % Time of meal event (sample)
-Scenario(:,1) = ([ 7; 12; 19; 24+7]-6) * 12;     % Time of meal event (sample)
-Scenario(:,2) = [50; 80; 40; 50];     % Amount carbs in meal event (gram)
+Scenario(:,1) = [ 8; 50; 121; 303; 397; 404; 433; 566; 645; 703; 871; 914; 985];     % Time of meal event (sample)
+Scenario(:,2) = [35; 79; 117; 40;  15;  100; 30;  100; 100; 100; 35;  79;  117];     % Amount carbs in meal event (gram)
 Time_Meal = round(Scenario(:,1)); Amt_Meal = Scenario(:,2);
 Meal_Vector = zeros(1,Sim_time); Meal_Vector(Time_Meal) = Amt_Meal;
 meal_time= []; meal_Amount = [];
 
 %% Bolus calculations
-ICR = (1700/TDIRlist(1,nn)/3);       % ICR: Insulin to Carb Ratio
-Ip = 1;                                         % percentage of pre-meal bolus  [unitless: 0-1]
-Bolus = Ip*(Meal_Vector/ICR)*1000/(Weight*Ts);    % pre-meal bolus insulin with correct units for model        [mU/kg/min]
-
-delayBolus = -30/Ts; 
-
-if(delayBolus < 0)
-    Bolus = [Bolus((abs(delayBolus) + 1): end) zeros(1,abs(delayBolus))];
-else
-    Bolus = [zeros(1,abs(delayBolus)) Bolus(1:(end-(abs(delayBolus) + 1))) zeros(1,abs(delayBolus))];
-end
-
-%% Add hypotreatment after 5 hours
-%Meal_Vector(60) = 15;
-
-%% Add correction bolus after 3 hours
-Bolus(12*(23 - 6)) = 2 * 1000 / (Weight*Ts);
-
+ICR = (1700/TDIRlist(1,nn)/3);                      % ICR: Insulin to Carb Ratio
+Ip = 1;                                             % percentage of pre-meal bolus  [unitless: 0-1]
+Bolus = Ip*(Meal_Vector/ICR)*1000/(Weight*Ts);      % pre-meal bolus insulin with correct units for model        [mU/kg/min]
 %% Initial Condition; the steady state run for the initial conditions  
-CGM_Start = 120;         % starting glucose (mg/dl)
+CGM_Start = 160;                                    % starting glucose (mg/dl)
 Num_States_Plant=8;
 xm_Plnt=SetInitialConditions(CGM_Start,Num_States_Plant,ModPar);
-Q1 = CGM_Start/18*ModPar(2);  % conversion to (mmol/kg); (mg/dl) divided by 18 (mmol/L) times Vdg (L/kg) = mmol/kg
-xm_Plnt = [Q1; xm_Plnt(2:end)];  % Replace Q1 compartment with the starting glucose level
+Q1 = CGM_Start/18*ModPar(2);                        % conversion to (mmol/kg); (mg/dl) divided by 18 (mmol/L) times Vdg (L/kg) = mmol/kg
+xm_Plnt = [Q1; xm_Plnt(2:end)];                     % Replace Q1 compartment with the starting glucose level
 
 %% Exercise Information
 PVO2max = 60;  % PVO2max: Percentage of maximum oxygen consumption [0-100]
 PAMM = 0.5;    % PAMM: Percentage of active muscular mass          [0-1]
-%Ex_Onset_time = 1*60 / Ts;    % n = 1 hours after the start of the simulation  
-Ex_Onset_time = 48*60 / Ts;    % n = 24 hours after the start of the simulation  
+Ex_Onset_time = 1*60 / Ts;    % n = 1 hours after the start of the simulation  
 Ex_duration = 45 / Ts;        % Duration of the exericse bout (e.g. 45 minutes)
 PGUA_1_Act = 0;               % Initial Periphery Glucose Uptake at active tissues 
 
@@ -89,7 +68,7 @@ tmax_resc = 20;
 % another Carbs_resc will be given and glucose is remeasured after Win_Resc until Glucose > Thr_Resc;
 % meanwhile Insulin insulin rates are turned down to IIR_Red_Resc percent for Timer_Resc minutes 
 % Note: time-to-maximum rescure carb absorption is tmax_resc [min] 
-Thr_Resc = -inf;  % Rescue carbs given for glucose < 70 mg/dL
+Thr_Resc = 70;  % Rescue carbs given for glucose < 70 mg/dL
 Carbs_resc = 20; % 20 g of carbs given when glucose <  70 mg/dL
 Win_Resc = 40/Ts;  % Window for lower insulin dosed is 40 minutes after hypo
 IIR_Red_Resc = 0.25; Timer_Resc = 40/Ts;  % Insulin is reduced to 25% for 40 minutes after a hypo
@@ -99,16 +78,10 @@ Cntr_Resc = Win_Resc;
 % measurement after a rescue carb is given; should be set to Win_Resc  
 resc_trig_Cntr = 0; time_resc = []; Ur_Plnt = 0; Ur_Mdl = 0;Dr_Plnt = 0; Dr_Mdl=0;
 Ins_Adj_Resc = ones(1,Sim_time+1); 
-%% Basal insulin
+%% 
 
 % Provide patient with constant basal insulin
 u_Basal = (TDIRlist(1,nn)/TDIR_Basal_Rate/24)*1000/Weight/60; % basal insulin (mU/kg/min)
-
-
-%% Modulate inputs
-Meal_Vector = Meal_Vector*mealModulation;
-Bolus = Bolus*bolusModulation;
-u_Basal = u_Basal*basalModulation;
 
 for kk = 0:Sim_time
     if kk == 0
@@ -129,23 +102,17 @@ for kk = 0:Sim_time
     [Ur_Plnt, Ur_Mdl, Dr_Plnt, Dr_Mdl, Cntr_Resc,time_resc,resc_trig_Cntr] = GetRescueCarb(Y_Plant,Ur_Plnt,Ur_Mdl,Dr_Plnt,Dr_Mdl, kk,Ts,ModPar,Cntr_Resc,time_resc,resc_trig_Cntr,Thr_Resc,Carbs_resc,Win_Resc,IIR_Red_Resc,Timer_Resc,Weight,tmax_resc,delay_rescue_val);
     %Rescue_Carb_Alg;
 end
-% Font_size = 14;
-% Xaxis_time = 0:(length(BG_Output)-1); Xaxis_time = Xaxis_time * Ts / 60 /24;
-% figure; 
-% subplot(211); plot(Xaxis_time, BG_Output); 
-% xhandle = xlabel('time [Day]'); yhandle = ylabel('Glucose [mg/dl]');
-% set(xhandle,'Fontsize',Font_size) ; set(xhandle,'Fontname','Timesnewroman');
-% set(yhandle,'Fontsize',Font_size) ; set(yhandle,'Fontname','Timesnewroman');
-% axis([0 Xaxis_time(1,end) 50 max(BG_Output)+50])
-% box('off')
-% subplot(212); plot(Xaxis_time, Ins_input);
-% xhandle = xlabel('time [Day]'); yhandle = ylabel('Insulin [u/hr]');
-% set(xhandle,'Fontsize',Font_size) ; set(xhandle,'Fontname','Timesnewroman');
-% set(yhandle,'Fontsize',Font_size) ; set(yhandle,'Fontname','Timesnewroman');
-%pause
-G = BG_Output(2:end)'; % mg/dl
-IB = Bolus * Weight / 1000; %u/min
-Ib = ones(size(G)) * u_Basal * Weight / 1000; %u/min
-CHO = Meal_Vector'/Ts; %g/min
-BW = Weight;
+Font_size = 14;
+Xaxis_time = 0:(length(BG_Output)-1); Xaxis_time = Xaxis_time * Ts / 60 /24;
+figure; 
+subplot(211); plot(Xaxis_time, BG_Output); 
+xhandle = xlabel('time [Day]'); yhandle = ylabel('Glucose [mg/dl]');
+set(xhandle,'Fontsize',Font_size) ; set(xhandle,'Fontname','Timesnewroman');
+set(yhandle,'Fontsize',Font_size) ; set(yhandle,'Fontname','Timesnewroman');
+axis([0 Xaxis_time(1,end) 50 max(BG_Output)+50])
+box('off')
+subplot(212); plot(Xaxis_time, Ins_input);
+xhandle = xlabel('time [Day]'); yhandle = ylabel('Insulin [u/hr]');
+set(xhandle,'Fontsize',Font_size) ; set(xhandle,'Fontname','Timesnewroman');
+set(yhandle,'Fontsize',Font_size) ; set(yhandle,'Fontname','Timesnewroman');
 end
