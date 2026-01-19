@@ -56,6 +56,12 @@ else
     Bolus = [zeros(1,abs(delayBolus)) Bolus(1:(end-(abs(delayBolus) + 1))) zeros(1,abs(delayBolus))];
 end
 
+%% Add hypotreatment after 5 hours
+%Meal_Vector(60) = 15;
+
+%% Add correction bolus after 3 hours
+%Bolus(12*(23 - 6)) = 2 * 1000 / (Weight*Ts);
+
 %% Initial Condition; the steady state run for the initial conditions  
 CGM_Start = 160;                                    % starting glucose (mg/dl)
 Num_States_Plant=8;
