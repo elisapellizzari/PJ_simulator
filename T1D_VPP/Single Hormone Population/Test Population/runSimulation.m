@@ -17,7 +17,6 @@ Sim_time = Days_Sim*1440/Ts;     % simulation time (sample)
 % nn = 2;                          % ID of the virtual subject
 
 %% loading the model parameters of the selected virtual patient 
-
 ModPar(1) = YmSbjt(1,nn);        % Fc01: Non-insulin mediated glucose uptake above 4.5 mmol/L ([mmol/kg]/min);
 ModPar(2) = YmSbjt(2,nn);        % Vdg: Volume of distribution of glucose (L/kg)
 ModPar(3) = YmSbjt(3,nn);        % k12: Rate constant for glucose transfer from Q2 to Q1 (min^-1)
@@ -35,6 +34,7 @@ ModPar(14) = YmSbjt(14,nn);      % Sf2: Sensitivity factor for insulin mediated 
 ModPar(15) = YmSbjt(15,nn);      % Sf3: Sensitivity factor for suppression of endogenous glucose production (x3) ([mU.L.min]^-1)
 ModPar(16) = Weights(1,nn);      % Weight of the virtual subject (kg); 
 Weight = ModPar(16);
+
 %% Select a sample meal scenario
 
 Scenario(:,1) = [ 8; 50; 121; 303; 397; 404; 433; 566; 645; 703; 871; 914; 985];     % Time of meal event (sample)
@@ -47,6 +47,15 @@ meal_time= []; meal_Amount = [];
 ICR = (1700/TDIRlist(1,nn)/3);                      % ICR: Insulin to Carb Ratio
 Ip = 1;                                             % percentage of pre-meal bolus  [unitless: 0-1]
 Bolus = Ip*(Meal_Vector/ICR)*1000/(Weight*Ts);      % pre-meal bolus insulin with correct units for model        [mU/kg/min]
+
+delayBolus = -30/Ts; 
+
+if(delayBolus < 0)
+    Bolus = [Bolus((abs(delayBolus) + 1): end) zeros(1,abs(delayBolus))];
+else
+    Bolus = [zeros(1,abs(delayBolus)) Bolus(1:(end-(abs(delayBolus) + 1))) zeros(1,abs(delayBolus))];
+end
+
 %% Initial Condition; the steady state run for the initial conditions  
 CGM_Start = 160;                                    % starting glucose (mg/dl)
 Num_States_Plant=8;
