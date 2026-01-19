@@ -56,13 +56,13 @@ Scenario(:,1) = [
     datasample(time_2S,1)
 ];
 
-amount_B  = 40:5:90;      % g
+amount_B  = 50:5:90;      % g
 amount_S1 = 30:5:40;      % g
-amount_L  = 40:5:100;     % g
+amount_L  = 60:5:100;     % g
 amount_S2 = 30:5:40;      % g
-amount_D  = 40:5:90;      % g
+amount_D  = 60:5:90;      % g
 
-amount_2B = 40:5:90;      % g
+amount_2B = 50:5:90;      % g
 amount_2S = 30:5:40;      % g
 
 Scenario(:,2) = [
