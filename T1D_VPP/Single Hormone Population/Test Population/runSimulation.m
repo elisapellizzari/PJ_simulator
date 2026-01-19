@@ -1,4 +1,4 @@
-function [G, CHO, IB, Ib, BW, ICR, CF, GT] = runSimulation(nn,bolusModulation,mealModulation,basalModulation)
+function [G, CHO, IB, Ib, BW, ICR, CF, GT] = runSimulation(nn,bolusInput_flag,bolusInput,bolusModulation,mealModulation,basalModulation)
 % This is a test file showing the glucose data for a sample meal sceanrio and
 % a sample virtual patient using the equations reporterd in Resalat et al.
 % 2019, "A statistical virtual patient population for the glucoregulatory system 
@@ -86,15 +86,19 @@ ICR = (500/TDIRlist(1,nn));                                                 % IC
 CF = (1700/TDIRlist(1,nn));
 GT = 120;
 
-Ip = 1;                                             % percentage of pre-meal bolus  [unitless: 0-1]
-Bolus = Ip*(Meal_Vector/ICR)*1000/(Weight*Ts);      % pre-meal bolus insulin with correct units for model        [mU/kg/min]
+Ip = 1;                                                                     % percentage of pre-meal bolus  [unitless: 0-1]
+if ~bolusInput_flag
+    Bolus = Ip*(Meal_Vector/ICR)*1000/(Weight*Ts);                          % pre-meal bolus insulin with correct units for model        [mU/kg/min]
+    
+    delayBolus = datasample([-30:5:30],1)/Ts; 
 
-delayBolus = datasample([-30:5:30],1)/Ts;
-
-if(delayBolus < 0)
-    Bolus = [Bolus((abs(delayBolus) + 1): end) zeros(1,abs(delayBolus))];
+    if (delayBolus < 0)
+        Bolus = [Bolus((abs(delayBolus) + 1): end) zeros(1,abs(delayBolus))];
+    elseif delayBolus > 0
+        Bolus = [zeros(1,abs(delayBolus)) Bolus(1 : end - abs(delayBolus))];
+    end
 else
-    Bolus = [zeros(1,abs(delayBolus)) Bolus(1:(end-(abs(delayBolus) + 1))) zeros(1,abs(delayBolus))];
+    Bolus = bolusInput / Weight * 1000;
 end
 
 %% Add hypotreatment after 5 hours
