@@ -102,10 +102,10 @@ else
 end
 
 %% Add hypotreatment after 5 hours
-%Meal_Vector(60) = 15;
+% Meal_Vector(9.5*12+1) = 25;   % 5-10-15-20-25 g at 15:30
 
 %% Add correction bolus after 3 hours
-%Bolus(12*(23 - 6)) = 2 * 1000 / (Weight*Ts);
+% Bolus(9.5*12+1) = 10/CF * 1000 / (Weight*Ts);     % 10-20-30-40-50/CF U at 15:30
 
 %% Initial Condition; the steady state run for the initial conditions  
 CGM_Start = 120;                                    % starting glucose (mg/dl)
