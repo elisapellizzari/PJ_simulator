@@ -151,9 +151,27 @@ u_Basal = u_Basal*basalModulation;
 for kk = 0:Sim_time
     if kk == 0
         u_Total = u_Basal;
+        bolus_vec = 0;
     else
-        u_Total = Ins_Adj_Resc(1,kk)*u_Basal + Bolus(1,kk);
+        iob = calculate_iob(bolus_vec, 1);
+        if ~bolusInput_flag
+            if Bolus(1,kk)>0
+                correction = ((BG_Output(kk)-GT)/CF - (iob));
+                u_Bolus = max(Bolus(1,kk) + correction, 0);
+            else
+                u_Bolus = 0;
+            end
+            IOB_vec(kk) = iob;
+            bolus_vec(kk) = u_Bolus;                                            % [mU/kg/min]
+            u_Total = Ins_Adj_Resc(1,kk)*u_Basal + u_Bolus;
+        else
+            u_Bolus = Bolus(kk);
+            IOB_vec(kk) = iob;
+            bolus_vec(kk) = u_Bolus;                                            % [mU/kg/min]
+            u_Total = Ins_Adj_Resc(1,kk)*u_Basal + u_Bolus;
+        end
     end
+
     %% Meal Response
     [Ug_Plnt,Ml_Vec_Plnt,meal_time,meal_Amount] = GetMealResponse(ModPar,Num_States_Plant,kk,Ts,meal_Amount,meal_time,Meal_Vector,Weight);
     %% Exercise Response
@@ -189,4 +207,24 @@ IB = Bolus * Weight / 1000; %u/min
 Ib = ones(size(G)) * u_Basal * Weight / 1000; %u/min
 CHO = Meal_Vector'/Ts; %g/min
 BW = Weight;
+end
+
+
+function iob = calculate_iob(bolus, ts)
+    k1 = 0.0173;
+    k2 = 0.0116;
+    k3 = 6.73;
+
+    iob_6h_curve = zeros(360, 1);
+
+    for t = 0:359
+        iob_6h_curve(t+1) = 1 - 0.75 * ( ...
+            (-k3 / (k2 * (k1 - k2)) * (exp(-k2 * t / 0.75) - 1) + ...
+             k3 / (k1 * (k1 - k2)) * (exp(-k1 * t / 0.75) - 1)) ...
+            / 2.4947e4 );
+    end
+    iob_6h_curve = iob_6h_curve(ts:ts:end);
+
+    conv_result = conv(bolus, iob_6h_curve);
+    iob = conv_result(length(bolus));
 end
