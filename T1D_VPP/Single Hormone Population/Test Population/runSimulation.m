@@ -63,7 +63,7 @@ end
 %Bolus(12*(23 - 6)) = 2 * 1000 / (Weight*Ts);
 
 %% Initial Condition; the steady state run for the initial conditions  
-CGM_Start = 160;                                    % starting glucose (mg/dl)
+CGM_Start = 120;                                    % starting glucose (mg/dl)
 Num_States_Plant=8;
 xm_Plnt=SetInitialConditions(CGM_Start,Num_States_Plant,ModPar);
 Q1 = CGM_Start/18*ModPar(2);                        % conversion to (mmol/kg); (mg/dl) divided by 18 (mmol/L) times Vdg (L/kg) = mmol/kg
