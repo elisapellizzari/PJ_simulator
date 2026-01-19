@@ -72,7 +72,7 @@ xm_Plnt = [Q1; xm_Plnt(2:end)];                     % Replace Q1 compartment wit
 %% Exercise Information
 PVO2max = 60;  % PVO2max: Percentage of maximum oxygen consumption [0-100]
 PAMM = 0.5;    % PAMM: Percentage of active muscular mass          [0-1]
-Ex_Onset_time = 1*60 / Ts;    % n = 1 hours after the start of the simulation  
+Ex_Onset_time = 48*60 / Ts;    % n = 1 hours after the start of the simulation  
 Ex_duration = 45 / Ts;        % Duration of the exericse bout (e.g. 45 minutes)
 PGUA_1_Act = 0;               % Initial Periphery Glucose Uptake at active tissues 
 
