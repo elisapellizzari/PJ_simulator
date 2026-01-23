@@ -42,7 +42,7 @@ time_L  = 6.5*12  : 8.5*12;      % 12:30–14:30
 time_S2 = 10.5*12 : 11.5*12;     % 16:30–17:30
 time_D  = 13.5*12 : 15.5*12;     % 19:30–21:30
 
-time_2B = 24*12 + (0.5*12  : 2.5*12);     % next day
+time_2B = 24*12 + 1;
 time_2S = 24*12 + (3.5*12  : 5*12);       % next day
 
 rng(pat_seed);
@@ -57,13 +57,13 @@ Scenario(:,1) = [
 ];
 
 amount_B  = 50:5:90;      % g
-amount_S1 = 30:5:40;      % g
+amount_S1 = 20:5:30;      % g
 amount_L  = 60:5:100;     % g
-amount_S2 = 30:5:40;      % g
+amount_S2 = 20:5:30;      % g
 amount_D  = 60:5:90;      % g
 
 amount_2B = 50:5:90;      % g
-amount_2S = 30:5:40;      % g
+amount_2S = 20:5:30;      % g
 
 Scenario(:,2) = [
     datasample(amount_B,1)
@@ -138,7 +138,7 @@ Ins_Adj_Resc = ones(1,Sim_time+1);
 
 %% Basal insulin
 % Provide patient with constant basal insulin
-u_Basal = (TDIRlist(1,nn)/TDIR_Basal_Rate/24)*1000/Weight/60); % basal insulin (mU/kg/min)
+u_Basal = ((TDIRlist(1,nn)/TDIR_Basal_Rate/24)*1000/Weight/60); % basal insulin (mU/kg/min)
 
 %% Modulate inputs
 Meal_Vector = Meal_Vector*mealModulation;
