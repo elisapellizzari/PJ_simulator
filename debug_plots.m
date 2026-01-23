@@ -59,6 +59,7 @@ disp(prctile(tirs, [25, 50, 75]))
 disp(prctile(tars, [25, 50, 75]))
 disp(prctile(tbrs, [25, 50, 75]))
 disp(hypos/99)
+mean(tbrs)
 disp(prctile(gris, [25, 50, 75]))
 disp(prctile(means_g, [25, 50, 75]))
 disp(prctile(stds_g, [25, 50, 75]))
@@ -161,7 +162,7 @@ idx_basal = contains(names, 'basal',  'IgnoreCase', true);
 basal_sim = list_sim(idx_basal);
 basal_name = {basal_sim.name};
 
-idx_bolus = contains(names, 'bolus',  'IgnoreCase', true);
+idx_bolus = contains(names, '_bolus',  'IgnoreCase', true);
 bolus_sim = list_sim(idx_bolus);
 bolus_name = {bolus_sim.name};
 
@@ -281,41 +282,41 @@ for s = 1:2
         this_sim = this_sim_name{i};
         this_pat = fullfile(base_folder, this_sim, "patient_" + pat);
         data = readtimetable(this_pat);
-    
+
         if contains(this_sim, 'baseline',  'IgnoreCase', true)
             linewidth=2;
         else
             linewidth=1;
         end
-    
+
         subplot(6, 1, [1:3])
         hold on, grid on
         plot(data.t, data.glucose, linewidth=linewidth)
-    
+
         subplot(6, 1, 4)
         hold on
         stem(data.t, data.cho)
-    
+
         subplot(6, 1, 5)
         hold on
         stem(data.t, data.bolus)
-    
+
         subplot(6, 1, 6)
         hold on
         plot(data.t, data.basal, linewidth=linewidth)
-    
+
         axes_list = findall(gcf, 'type', 'axes');
         linkaxes(axes_list, 'x');
-    
+
     end
-    
+
     subplot(6,1,[1:3])
     title(sprintf('Glucose - patient %s', pat))
     ylabel('(mg/dL)')
     legend(this_sim_name)
     yline(180, 'k--')
     yline(70, 'k--')
-    
+
     subplot(614)
     title('CHO')
     ylabel('(g/min)')
@@ -323,34 +324,34 @@ for s = 1:2
     labeled_idx = ~ismissing(data.cho_label);
     labeled_ts  = data.t(labeled_idx);
     labeled_vals = data.cho_label(labeled_idx);
-    
+
     for k = 1:height(data)
         if data.cho(k) > 0
             % Find the nearest labeled timestamp
             [~, nearest_idx] = min(abs(labeled_ts - data.t(k)));
             label = labeled_vals(nearest_idx);
-    
+
             % Add label above the stem
             text(data.t(k), data.cho(k) + 1, string(label), ...
-                'HorizontalAlignment','center', ...
+                'HorizontalAlignment','center', ...isi
                 'VerticalAlignment','bottom', ...
                 'FontSize',12, ...
                 'Color','k');
         end
     end
-    
+
     subplot(615)
     title('Bolus')
     ylabel('(U/min)')
-    
+
     subplot(616)
     title('Basal')
     ylabel('(U/min)')
     xlabel('Time')
-    
+
     set(findall(gcf, '-property', 'FontSize'), 'FontSize', 16);
     fig.WindowState = 'maximized';
-    
+
     if ~exist('debug_plots', 'dir')
         mkdir('debug_plots');
     end
