@@ -203,6 +203,7 @@ function saveResults(glucose, bolus, basal, meal, iob, weights, crs, cfs, gts, l
         t = t(1:end-1)';
 
         glucose = glucoseAll(:,p);
+        glucose(glucose<0) = 10^(-5); 
         cho = mealAll(:,p);
         bolus = bolusAll(:,p);
         basal = basalAll(:,p);
